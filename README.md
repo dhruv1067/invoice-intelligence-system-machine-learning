@@ -309,30 +309,7 @@ or
 
 # 📸 Application Preview
 
-> Add your Streamlit screenshots here.
-
-```text
-docs/
-├── dashboard.png
-├── freight_prediction.png
-└── invoice_flagging.png
-```
-
-After adding the images to your repository, replace this section with:
-
-```markdown
-### Dashboard
-
-![Dashboard](docs/dashboard.png)
-
-### Freight Cost Prediction
-
-![Freight Prediction](docs/freight_prediction.png)
-
-### Invoice Risk Flagging
-
-![Invoice Flagging](docs/invoice_flagging.png)
-```
+![App](app.png)
 
 ---
 
@@ -357,41 +334,6 @@ After adding the images to your repository, replace this section with:
 ### Model Persistence
 
 `Joblib`
-
----
-
-# 📁 Project Structure
-
-```text
-Vendor-Invoice-Intelligence/
-│
-├── 📂 data/
-│   └── inventory.db
-│
-├── 📂 models/
-│   ├── predict_freight_model.pkl
-│   ├── predict_flag_invoice.pkl
-│   └── scaler.pkl
-│
-├── 📂 inferencing/
-│   ├── predict_freight.py
-│   └── predict_invoice_flag.py
-│
-├── 📓 Predicting Freight Cost.ipynb
-├── 📓 Invoice flagging.ipynb
-│
-├── 🐍 app.py
-│
-├── 🐍 data_preprocessing.py
-├── 🐍 model_evaluation.py
-├── 🐍 train.py
-│
-├── 🐍 data_preprocessing(1).py
-├── 🐍 model_evaluation(1).py
-├── 🐍 train(1).py
-│
-└── 📄 README.md
-```
 
 ---
 
@@ -443,78 +385,6 @@ Evaluate Best Estimator
 Save Classifier
 ```
 
----
-
-# ⚙️ Installation
-
-### 1. Clone the repository
-
-```bash
-git clone <YOUR-GITHUB-REPOSITORY-URL>
-cd Vendor-Invoice-Intelligence
-```
-
-### 2. Install dependencies
-
-```bash
-pip install pandas numpy scikit-learn matplotlib seaborn plotly streamlit joblib
-```
-
-### 3. Add the database
-
-Place the SQLite database here:
-
-```text
-data/inventory.db
-```
-
----
-
-# ▶️ Run the Application
-
-Start Streamlit:
-
-```bash
-streamlit run app.py
-```
-
-The application will open in your browser.
-
----
-
-# 🧪 Train the Models
-
-### Freight Prediction Model
-
-```bash
-python train.py
-```
-
-This will:
-
-1. Load invoice data
-2. Prepare features
-3. Split the dataset
-4. Train three regression models
-5. Evaluate the models
-6. Select the lowest-MAE model
-7. Save the model to `models/`
-
-### Invoice Risk Model
-
-```bash
-python "train(1).py"
-```
-
-This will:
-
-1. Load invoice and purchase data
-2. Generate invoice-risk labels
-3. Prepare the five classifier features
-4. Scale the features
-5. Tune the Random Forest classifier
-6. Evaluate the best estimator
-7. Save the trained classifier
 
 ---
 
@@ -541,38 +411,6 @@ The project focuses on practical operational problems:
 * Freight cost forecasting
 * Invoice exception detection
 * Manual review prioritization
-
----
-
-# ⚠️ Limitations
-
-The invoice-risk model currently uses **rule-generated labels**.
-
-This means the model is learning patterns corresponding to the project's predefined risk criteria rather than learning from a dataset containing verified historical fraud or manual-review outcomes.
-
-A production system should ideally use historical:
-
-* Approved invoices
-* Rejected invoices
-* Manually reviewed invoices
-* Confirmed anomalies/fraud cases
-
-as ground-truth labels.
-
----
-
-# 🚀 Future Improvements
-
-* [ ] Replace rule-generated labels with historical review outcomes
-* [ ] Add vendor-level historical behavior
-* [ ] Add price deviation features
-* [ ] Add anomaly detection
-* [ ] Add prediction probabilities
-* [ ] Add model monitoring
-* [ ] Automate model retraining
-* [ ] Deploy the application
-* [ ] Add authentication and role-based access
-* [ ] Add automated reporting
 
 ---
 
