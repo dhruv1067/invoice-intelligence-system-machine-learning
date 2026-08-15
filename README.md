@@ -1,498 +1,597 @@
-🧾 Vendor Invoice Intelligence System
+# 🧾 Vendor Invoice Intelligence System
 
 <div align="center">
 
-AI-Powered Freight Cost Prediction & Invoice Risk Flagging
+### AI-Powered Freight Cost Prediction & Invoice Risk Flagging
 
-An end-to-end machine learning project that combines vendor invoice analytics, predictive modeling, and an interactive Streamlit application to support freight forecasting and invoice review.
+An end-to-end machine learning application that analyzes vendor invoice data to **predict freight costs** and **identify invoices requiring manual review**.
 
 <br>
 
-
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square\&logo=python\&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-Data%20Analysis-150458?style=flat-square\&logo=pandas\&logoColor=white)
+![Scikit Learn](https://img.shields.io/badge/Scikit--learn-Machine%20Learning-F7931E?style=flat-square\&logo=scikit-learn\&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-Web%20App-FF4B4B?style=flat-square\&logo=streamlit\&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?style=flat-square\&logo=sqlite\&logoColor=white)
 
 </div>
 
-🎯 What is this project?
+---
 
-Vendor invoice processing involves checking invoice values, quantities, freight charges, purchase information, and delivery timelines. This project builds an ML-based workflow around two practical use cases:
+## 📌 Overview
 
-Module
+Vendor invoice processing can involve checking invoice amounts, quantities, freight charges, purchasing information, and delivery timelines.
 
-Purpose
+This project develops an **end-to-end ML pipeline** to automate two parts of this process:
 
-Output
+| 🚚 Freight Cost Prediction                                               | 🚨 Invoice Risk Flagging                                   |
+| :----------------------------------------------------------------------- | :--------------------------------------------------------- |
+| Predicts expected freight cost using invoice quantity and invoice value. | Identifies invoices that should be sent for manual review. |
+| **Input:** Quantity + Dollars                                            | **Input:** Invoice & purchase-level features               |
+| **Output:** Predicted Freight Cost                                       | **Output:** Manual Approval / Auto-Approval                |
 
-🚚 Freight Cost Prediction
+Both models are integrated into an interactive **Streamlit Vendor Invoice Intelligence Portal**.
 
-Estimate freight cost from invoice quantity and value
+---
 
-Predicted freight cost
+# ✨ Highlights
 
-🚨 Invoice Risk Flagging
+* 🚚 **Freight cost prediction**
+* 🚨 **Invoice risk classification**
+* 🗄️ SQLite database integration
+* 🧹 Data preprocessing and feature engineering
+* 🤖 Comparison of multiple ML algorithms
+* 🔍 Random Forest hyperparameter tuning using `GridSearchCV`
+* 📊 Regression and classification evaluation
+* 💾 Model serialization with Joblib
+* 🖥️ Interactive Streamlit interface
+* 🔌 Separate training and inference pipelines
 
-Identify invoices that may require additional review
+---
 
-Manual Approval / Auto-Approval
+# 🏗️ System Architecture
 
-Both models are integrated into a single Streamlit-based Vendor Invoice Intelligence Portal.
+```text
+                         ┌──────────────────────┐
+                         │    SQLite Database   │
+                         │     inventory.db     │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │ Data Extraction &    │
+                         │ Feature Engineering  │
+                         └──────────┬───────────┘
+                                    │
+                     ┌──────────────┴──────────────┐
+                     │                             │
+                     ▼                             ▼
+          ┌────────────────────┐        ┌────────────────────┐
+          │ Freight Prediction │        │ Invoice Risk       │
+          │     Pipeline       │        │    Pipeline        │
+          └─────────┬──────────┘        └─────────┬──────────┘
+                    │                             │
+                    ▼                             ▼
+          ┌────────────────────┐        ┌────────────────────┐
+          │ Model Comparison   │        │ Random Forest +   │
+          │                    │        │   GridSearchCV     │
+          └─────────┬──────────┘        └─────────┬──────────┘
+                    │                             │
+                    ▼                             ▼
+          ┌────────────────────┐        ┌────────────────────┐
+          │ Best Regression    │        │ Tuned Classifier   │
+          │      Model         │        │                    │
+          └─────────┬──────────┘        └─────────┬──────────┘
+                    │                             │
+                    └──────────────┬──────────────┘
+                                   ▼
+                         ┌──────────────────────┐
+                         │   Saved ML Models   │
+                         │      (.pkl)          │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │  Streamlit Portal   │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │  Real-Time Results  │
+                         └──────────────────────┘
+```
 
-✨ Key Features
+---
 
-📊 Exploratory data analysis and feature analysis
+# 🚚 Module 1 — Freight Cost Prediction
 
-🗄️ SQLite-based data extraction
-
-🤖 Multiple ML models for model comparison
-
-🔎 Random Forest hyperparameter tuning with GridSearchCV
-
-📈 Regression and classification evaluation
-
-💾 Model persistence using Joblib
-
-⚡ Separate inference modules for production-style prediction
-
-🖥️ Interactive Streamlit dashboard
-
-🔄 End-to-end workflow from database → ML → application
-
-🧠 Machine Learning Pipeline
-
-flowchart LR
-    A[(SQLite Database)] --> B[Data Extraction]
-    B --> C[Feature Engineering]
-    C --> D{ML Pipelines}
-
-    D --> E[Freight Cost Prediction]
-    D --> F[Invoice Risk Flagging]
-
-    E --> G[Model Comparison]
-    G --> H[Best Regression Model]
-
-    F --> I[Feature Scaling]
-    I --> J[Random Forest + GridSearchCV]
-
-    H --> K[Saved Model]
-    J --> K2[Saved Model]
-
-    K --> L[Streamlit Portal]
-    K2 --> L
-    L --> M[Real-Time Predictions]
-
-🚚 1. Freight Cost Prediction
-
-Objective
+## Objective
 
 Predict the freight cost associated with a vendor invoice using:
 
+```text
 Quantity
-
 Dollars
+```
 
-The target variable is:
+Target:
 
+```text
 Freight
+```
 
-Model Development
+The data is loaded from the `vendor_invoice` table in the SQLite database.
 
-Three regression algorithms are evaluated:
+### Models Evaluated
 
-Linear Regression
+Three regression algorithms were compared:
 
-Decision Tree Regression
+* Linear Regression
+* Decision Tree Regression
+* Random Forest Regression
 
-Random Forest Regression
+Evaluation metrics:
 
-The training pipeline evaluates the models using:
+* MAE
+* RMSE
+* R²
 
-MAE
+The training pipeline automatically selects the model with the **lowest MAE**.
 
-RMSE
+### 📊 Results
 
-R²
+| Model                    |     MAE ↓ |       RMSE ↓ |       R² ↑ |
+| :----------------------- | --------: | -----------: | ---------: |
+| 🥇 **Linear Regression** | **24.46** | **15482.52** | **97.00%** |
+| Decision Tree Regression |     33.87 |     33306.53 |     93.55% |
+| Random Forest Regression |     27.65 |     19215.83 |     96.28% |
 
-The final model is selected using lowest MAE and saved as:
+### 🏆 Selected Model
 
+**Linear Regression**
+
+```text
+MAE  : 24.46
+RMSE : 15482.52
+R²   : 97.00%
+```
+
+The selected model is saved as:
+
+```text
 models/predict_freight_model.pkl
+```
 
-📊 Model Comparison
+---
 
-Model
+# 🚨 Module 2 — Invoice Risk Flagging
 
-MAE
+## Objective
 
-RMSE
+Determine whether a vendor invoice should be:
 
-R²
-
-🥇 Linear Regression
-
-24.46
-
-15482.52
-
-97.00%
-
-Decision Tree Regression
-
-33.87
-
-33306.53
-
-93.55%
-
-Random Forest Regression
-
-27.65
-
-19215.83
-
-96.28%
-
-Best model: Linear RegressionR²: 97.00%
-
-🚨 2. Invoice Risk Flagging
-
-Objective
-
-Classify vendor invoices into:
-
+```text
 🟢 SAFE FOR AUTO-APPROVAL
+```
+
+or
+
+```text
 🔴 MANUAL APPROVAL
+```
 
-The model uses five features:
+### Features
 
+The deployed classifier uses:
+
+```text
 invoice_quantity
 invoice_dollars
 Freight
 total_item_quantity
 total_item_dollars
+```
 
-🔧 Risk Label Generation
+### 🔧 Feature Engineering
 
-The training data creates the target label using business rules based on invoice/item dollar differences and receiving delays.
+The preprocessing pipeline aggregates purchase-level information by `PONumber` and derives additional information such as:
+
+* Total brands
+* Total item quantity
+* Total item dollars
+* Average receiving delay
+* Days from PO to invoice
+* Days from invoice to payment
+
+### Risk Label
+
+The current target variable is **rule-generated**.
 
 An invoice is flagged when:
 
-The difference between invoice_dollars and total_item_dollars is greater than 5, or
+```text
+|invoice_dollars - total_item_dollars| > 5
+```
 
-avg_receiving_delay is greater than 10 days.
+**OR**
 
-Otherwise, it is classified as normal.
+```text
+avg_receiving_delay > 10 days
+```
 
-Important: The current target is rule-generated rather than based on historical human approval/fraud labels.
+Otherwise, the invoice is classified as normal.
 
-🤖 Model
+> ⚠️ The classifier therefore learns the defined business rules rather than historical human-verified fraud outcomes.
 
-A Random Forest Classifier is optimized using:
+---
 
+## 🤖 Model Training
+
+A **Random Forest Classifier** was optimized using:
+
+```text
 GridSearchCV
+5-fold Cross Validation
+F1 Score
+```
 
-5-fold cross-validation
+The hyperparameter search covered:
 
-F1 score as the optimization metric
-
-The hyperparameter search includes:
-
+```text
 n_estimators
 max_depth
 min_samples_split
 min_samples_leaf
 criterion
+```
+
+### 📊 Classification Performance
+
+| Metric        |      Score |
+| :------------ | ---------: |
+| **Accuracy**  | **88.82%** |
+| **Precision** | **89.66%** |
+| **Recall**    | **88.82%** |
+| **F1 Score**  | **88.34%** |
 
 The trained classifier is saved as:
 
+```text
 models/predict_flag_invoice.pkl
+```
 
-🖥️ Streamlit Application
+---
 
-The project provides a single interactive portal with two prediction modes.
+# 🖥️ Streamlit Application
 
-🚚 Freight Cost Prediction
+The trained models are exposed through a single interactive application.
 
-Users enter:
+### 🚚 Freight Prediction
 
+The user provides:
+
+```text
 Quantity
-
 Invoice Dollars
+```
 
 The application returns:
 
+```text
 Estimated Freight Cost
+```
 
-🚨 Invoice Risk Prediction
+### 🚨 Invoice Risk Prediction
 
-Users enter:
+The user provides:
 
+```text
 Invoice Quantity
-
 Invoice Dollars
-
 Freight Cost
-
 Total Item Quantity
-
 Total Item Dollars
+```
 
-The application returns either:
+The application returns:
 
+```text
 🔴 Invoice requires MANUAL APPROVAL
+```
 
 or
 
-🟢 Invoice is SAFE for Auto-APPROVAL
+```text
+🟢 Invoice is SAFE for Auto-Approval
+```
 
-🗂️ Project Structure
+---
 
+# 📸 Application Preview
+
+> Add your Streamlit screenshots here.
+
+```text
+docs/
+├── dashboard.png
+├── freight_prediction.png
+└── invoice_flagging.png
+```
+
+After adding the images to your repository, replace this section with:
+
+```markdown
+### Dashboard
+
+![Dashboard](docs/dashboard.png)
+
+### Freight Cost Prediction
+
+![Freight Prediction](docs/freight_prediction.png)
+
+### Invoice Risk Flagging
+
+![Invoice Flagging](docs/invoice_flagging.png)
+```
+
+---
+
+# 🧰 Tech Stack
+
+### Data
+
+`Python` · `Pandas` · `NumPy` · `SQLite`
+
+### Machine Learning
+
+`Scikit-learn` · `Linear Regression` · `Decision Tree` · `Random Forest` · `GridSearchCV`
+
+### Visualization
+
+`Matplotlib` · `Seaborn` · `Plotly`
+
+### Application
+
+`Streamlit`
+
+### Model Persistence
+
+`Joblib`
+
+---
+
+# 📁 Project Structure
+
+```text
 Vendor-Invoice-Intelligence/
 │
-├── 📁 data/
+├── 📂 data/
 │   └── inventory.db
 │
-├── 📁 models/
+├── 📂 models/
 │   ├── predict_freight_model.pkl
 │   ├── predict_flag_invoice.pkl
 │   └── scaler.pkl
 │
-├── 📁 inferencing/
+├── 📂 inferencing/
 │   ├── predict_freight.py
 │   └── predict_invoice_flag.py
-│
-├── 📄 app.py
-│
-├── 📄 data_preprocessing.py
-├── 📄 model_evaluation.py
-├── 📄 train.py
-│
-├── 📄 data_preprocessing(1).py
-├── 📄 model_evaluation(1).py
-├── 📄 train(1).py
 │
 ├── 📓 Predicting Freight Cost.ipynb
 ├── 📓 Invoice flagging.ipynb
 │
+├── 🐍 app.py
+│
+├── 🐍 data_preprocessing.py
+├── 🐍 model_evaluation.py
+├── 🐍 train.py
+│
+├── 🐍 data_preprocessing(1).py
+├── 🐍 model_evaluation(1).py
+├── 🐍 train(1).py
+│
 └── 📄 README.md
+```
 
-🛠️ Tech Stack
+---
 
-Programming & Data
+# 🔄 ML Workflow
 
-Python · Pandas · NumPy · SQLite
+## Freight Prediction
 
-Machine Learning
-
-Scikit-learn · Linear Regression · Decision Tree · Random Forest · GridSearchCV
-
-Visualization
-
-Matplotlib · Seaborn · Plotly
-
-Application
-
-Streamlit
-
-Model Management
-
-Joblib
-
-⚙️ Getting Started
-
-1️⃣ Clone the repository
-
-git clone <your-repository-url>
-cd <repository-name>
-
-2️⃣ Install dependencies
-
-pip install pandas numpy scikit-learn matplotlib seaborn plotly streamlit joblib
-
-3️⃣ Verify the database
-
-Place the SQLite database at:
-
-data/inventory.db
-
-▶️ Running the Application
-
-Start the Streamlit application:
-
-streamlit run app.py
-
-The application will open in your browser.
-
-Use the sidebar to switch between:
-
-🚚 Freight Cost Prediction
-🚨 Invoice Manual Approval Flag
-
-🏋️ Training the Models
-
-Freight Model
-
-Run:
-
-python train.py
-
-The pipeline:
-
-Load SQLite data
+```text
+SQLite Database
+      ↓
+Load Vendor Invoice Data
       ↓
 Select Quantity + Dollars
       ↓
-80/20 Train-Test Split
+Train/Test Split
       ↓
-Train 3 Regression Models
+Linear Regression
+Decision Tree
+Random Forest
       ↓
-Evaluate MAE / RMSE / R²
+Model Evaluation
       ↓
-Select Lowest-MAE Model
+Select Lowest MAE
       ↓
-Save predict_freight_model.pkl
+Save Best Model
+```
 
-Invoice Risk Model
+## Invoice Risk Classification
 
-Run:
-
-python "train(1).py"
-
-The pipeline:
-
-Load invoice + purchase data
-          ↓
-Create risk labels
-          ↓
-Select 5 features
-          ↓
-80/20 Train-Test Split
-          ↓
+```text
+SQLite Database
+      ↓
+Join Invoice + Purchase Data
+      ↓
+Feature Engineering
+      ↓
+Generate Risk Labels
+      ↓
+Train/Test Split
+      ↓
 StandardScaler
-          ↓
-Random Forest + GridSearchCV
-          ↓
-Evaluate Classifier
-          ↓
-Save predict_flag_invoice.pkl
+      ↓
+Random Forest
+      ↓
+GridSearchCV
+      ↓
+Evaluate Best Estimator
+      ↓
+Save Classifier
+```
 
-📈 Evaluation
+---
 
-Freight Prediction
+# ⚙️ Installation
 
-Regression metrics
+### 1. Clone the repository
 
-Mean Absolute Error (MAE)
+```bash
+git clone <YOUR-GITHUB-REPOSITORY-URL>
+cd Vendor-Invoice-Intelligence
+```
 
-Root Mean Squared Error (RMSE)
+### 2. Install dependencies
 
-R² Score
+```bash
+pip install pandas numpy scikit-learn matplotlib seaborn plotly streamlit joblib
+```
 
-The best-performing regression model achieved:
+### 3. Add the database
 
-R² ≈ 97%
-MAE = 24.46
+Place the SQLite database here:
 
-Invoice Risk Classification
+```text
+data/inventory.db
+```
 
-Classification metrics
+---
 
-Accuracy
+# ▶️ Run the Application
 
-Precision
+Start Streamlit:
 
-Recall
+```bash
+streamlit run app.py
+```
 
-F1 Score
+The application will open in your browser.
 
-Classification Report
+---
 
-The optimized Random Forest classifier achieved:
+# 🧪 Train the Models
 
-Accuracy ≈ 88.82%
-F1 Score ≈ 88.34%
+### Freight Prediction Model
 
-🔌 Inference Architecture
+```bash
+python train.py
+```
 
-The application does not retrain models during prediction.
+This will:
 
-Instead, the saved .pkl models are loaded by dedicated inference modules:
+1. Load invoice data
+2. Prepare features
+3. Split the dataset
+4. Train three regression models
+5. Evaluate the models
+6. Select the lowest-MAE model
+7. Save the model to `models/`
 
-User Input
-    │
-    ▼
-Streamlit UI
-    │
-    ├───────────────┐
-    ▼               ▼
-Freight Model   Invoice Flag Model
-    │               │
-    ▼               ▼
-Prediction      Risk Flag
+### Invoice Risk Model
 
-This separates the training pipeline from the application/inference layer.
+```bash
+python "train(1).py"
+```
 
-💡 Business Value
+This will:
 
-The project demonstrates how machine learning can be applied to common invoice-processing workflows:
+1. Load invoice and purchase data
+2. Generate invoice-risk labels
+3. Prepare the five classifier features
+4. Scale the features
+5. Tune the Random Forest classifier
+6. Evaluate the best estimator
+7. Save the trained classifier
 
-🚚 Cost Forecasting
+---
 
-Estimate expected freight charges before or during invoice processing.
+# 📌 Key Project Takeaways
 
-🚨 Exception Identification
+### 01 — End-to-End ML
 
-Prioritize invoices that match defined risk conditions for manual review.
+The project covers the complete workflow:
 
-⚡ Process Efficiency
+**Data → Preprocessing → Feature Engineering → Training → Evaluation → Model Saving → Inference → Application**
 
-Provide immediate predictions through an interactive application rather than requiring manual analysis for every invoice.
+### 02 — Model Selection
 
-📊 Data-Driven Decisions
+Instead of assuming a single algorithm would work best, multiple models were evaluated and compared using appropriate performance metrics.
 
-Use historical invoice and purchasing information to support financial and operational analysis.
+### 03 — Hyperparameter Optimization
 
-⚠️ Limitations
+The invoice classifier uses `GridSearchCV` with 5-fold cross-validation to optimize the Random Forest model.
 
-The invoice-risk classifier currently learns from rule-generated labels rather than historical human-reviewed outcomes.
+### 04 — Business-Oriented ML
 
-Therefore, it should be interpreted as a demonstration of an ML-based invoice screening workflow rather than a production fraud-detection system.
+The project focuses on practical operational problems:
 
-For a production implementation, the model could be trained using historical:
+* Freight cost forecasting
+* Invoice exception detection
+* Manual review prioritization
 
-Approved invoices
+---
 
-Rejected invoices
+# ⚠️ Limitations
 
-Manually flagged invoices
+The invoice-risk model currently uses **rule-generated labels**.
 
-Confirmed fraud/anomaly cases
+This means the model is learning patterns corresponding to the project's predefined risk criteria rather than learning from a dataset containing verified historical fraud or manual-review outcomes.
 
-🚀 Future Improvements
+A production system should ideally use historical:
 
-Use historical human-reviewed invoice outcomes as training labels
+* Approved invoices
+* Rejected invoices
+* Manually reviewed invoices
+* Confirmed anomalies/fraud cases
 
-Add vendor-level historical behavior features
+as ground-truth labels.
 
-Add price and quantity deviation features
+---
 
-Add anomaly detection
+# 🚀 Future Improvements
 
-Add prediction probabilities/confidence scores
+* [ ] Replace rule-generated labels with historical review outcomes
+* [ ] Add vendor-level historical behavior
+* [ ] Add price deviation features
+* [ ] Add anomaly detection
+* [ ] Add prediction probabilities
+* [ ] Add model monitoring
+* [ ] Automate model retraining
+* [ ] Deploy the application
+* [ ] Add authentication and role-based access
+* [ ] Add automated reporting
 
-Add model monitoring
+---
 
-Automate periodic model retraining
-
-Deploy the application to a cloud environment
-
-Add authentication and role-based access
-
-👨‍💻 Author
-
-DhruvB.Tech Chemical Engineering — NIT Jalandhar
+# 👨‍💻 Author
 
 <div align="center">
 
-⭐ If you found this project interesting, consider giving the repository a star!
+### Dhruv
 
-Built with Python • Scikit-learn • SQLite • Streamlit
+**B.Tech Chemical Engineering — NIT Jalandhar**
+
+Machine Learning · Data Analytics · Python · Supply Chain Analytics
+
+</div>
+
+---
+
+<div align="center">
+
+### ⭐ If you found this project useful, consider giving the repository a star!
 
 </div>
